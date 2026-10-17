@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:InventarioDomestico.App.ViewModels"
+             xmlns:models="clr-namespace:InventarioDomestico.Core.Models;assembly=InventarioDomestico.Core"
+             x:Class="InventarioDomestico.App.Views.HistoricoPage"
+             x:DataType="vm:HistoricoViewModel"
+             Title="{Binding Title}"
+             BackgroundColor="#F7F9FC">
+
+    <Grid RowDefinitions="Auto,*" Padding="14">
+
+        <!-- Cabeçalho Informativo -->
+        <Frame Grid.Row="0" BackgroundColor="White" CornerRadius="8" Padding="12" Margin="0,0,0,10" BorderColor="#E0E0E0">
+            <VerticalStackLayout Spacing="4">
+                <Label Text="{Binding Subtitulo}" FontSize="14" FontAttributes="Bold" TextColor="#1E88E5" />
+                <Label Text="Registro imutável de todas as entradas, saídas e ajustes." FontSize="11" TextColor="#757575" />
+            </VerticalStackLayout>
+        </Frame>
+
+        <!-- Lista de Movimentações -->
+        <RefreshView Grid.Row="1" Command="{Binding CarregarCommand}" IsRefreshing="{Binding IsBusy}">
+            <CollectionView ItemsSource="{Binding Movimentacoes}" SelectionMode="None">
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="8" Padding="20">
+                        <Label Text="📜" FontSize="40" HorizontalTextAlignment="Center" />
+                        <Label Text="Nenhuma movimentação registrada" FontSize="16" FontAttributes="Bold" TextColor="#424242" HorizontalTextAlignment="Center" />
+                        <Label Text="As entradas, saídas e contagens deste item aparecerão aqui." FontSize="13" TextColor="#757575" HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:MovimentacaoEstoque">
+                        <Frame Margin="0,4,0,6" Padding="12" CornerRadius="8" BackgroundColor="White" BorderColor="#E0E0E0">
+                            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="8" RowSpacing="3">
+                                
+                                <!-- Tipo e Saldo -->
+                                <Label Grid.Row="0" Grid.Column="0" Text="{Binding ResumoMovimentacao}" FontSize="14" FontAttributes="Bold" TextColor="#212121" />
+                                
+                                <!-- Data e Hora -->
+                                <Label Grid.Row="0" Grid.Column="1" Text="{Binding DataHora, StringFormat='{0:dd/MM/yy HH:mm}'}" FontSize="12" TextColor="#757575" HorizontalTextAlignment="End" />
+
+                                <!-- Unidade -->
+                                <Label Grid.Row="1" Grid.Column="0" Text="{Binding UnidadeMedida, StringFormat='Unidade: {0}'}" FontSize="11" TextColor="#9E9E9E" />
+
+                                <!-- Observação -->
+                                <Label Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Observacao, StringFormat='Obs: {0}'}" FontSize="12" FontAttributes="Italic" TextColor="#616161" IsVisible="{Binding Observacao, Converter={StaticResource InverseBooleanConverter}, ConverterParameter=Empty}" />
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+
+    </Grid>
+</ContentPage>

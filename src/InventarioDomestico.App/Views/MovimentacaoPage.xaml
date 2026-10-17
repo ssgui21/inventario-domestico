@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:InventarioDomestico.App.ViewModels"
+             x:Class="InventarioDomestico.App.Views.MovimentacaoPage"
+             x:DataType="vm:MovimentacaoViewModel"
+             Title="{Binding Title}"
+             BackgroundColor="#F7F9FC">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="18" Spacing="16">
+
+            <!-- Card Resumo do Produto -->
+            <Frame BackgroundColor="White" CornerRadius="12" Padding="16" BorderColor="#E0E0E0">
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Produto Selecionado" FontSize="11" TextColor="#757575" FontAttributes="Bold" />
+                    <Label Text="{Binding Produto.Nome}" FontSize="18" FontAttributes="Bold" TextColor="#212121" />
+                    
+                    <HorizontalStackLayout Spacing="6" Margin="0,4,0,0">
+                        <Label Text="Estoque Atual:" FontSize="13" TextColor="#616161" />
+                        <Label Text="{Binding Produto.QuantidadeFormatada}" FontSize="14" FontAttributes="Bold" TextColor="#1E88E5" />
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Card de Operação -->
+            <Frame BackgroundColor="White" CornerRadius="12" Padding="16" BorderColor="#E0E0E0">
+                <VerticalStackLayout Spacing="14">
+
+                    <!-- Quantidade a Movimentar -->
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Quantidade *" FontSize="13" FontAttributes="Bold" TextColor="#424242" />
+                        <Entry Text="{Binding QuantidadeTexto}"
+                               Keyboard="Numeric"
+                               Placeholder="Informe a quantidade..."
+                               FontSize="18"
+                               FontAttributes="Bold" />
+                        <Label Text="Aceita vírgula ou ponto para frações (ex: 1,5 ou 0.75)" FontSize="11" TextColor="#9E9E9E" />
+                    </VerticalStackLayout>
+
+                    <!-- Alerta de Validação em Tempo Real -->
+                    <Frame BackgroundColor="#FFEBEE" 
+                           BorderColor="#EF5350" 
+                           CornerRadius="8" 
+                           Padding="10" 
+                           IsVisible="{Binding TemAlertaValidacao}">
+                        <Label Text="{Binding AlertaValidacao}" FontSize="12" FontAttributes="Bold" TextColor="#C62828" />
+                    </Frame>
+
+                    <!-- Pré-visualização do Saldo Resultante -->
+                    <Frame BackgroundColor="#F1F8E9" BorderColor="#C8E6C9" CornerRadius="8" Padding="12">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Grid.Column="0" Text="Saldo Previsto após operação:" FontSize="13" TextColor="#2E7D32" VerticalOptions="Center" />
+                            <Label Grid.Column="1" Text="{Binding SaldoPrevisto, StringFormat='{0:0.##}'}" FontSize="16" FontAttributes="Bold" TextColor="#1B5E20" VerticalOptions="Center" />
+                        </Grid>
+                    </Frame>
+
+                    <!-- Observação Opcional -->
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Observação / Motivo (Opcional)" FontSize="13" FontAttributes="Bold" TextColor="#424242" />
+                        <Editor Text="{Binding Observacao}"
+                                Placeholder="Ex: Compra no mercado, uso na receita, ajuste de contagem..."
+                                AutoSize="TextChanges"
+                                HeightRequest="70"
+                                FontSize="13" />
+                    </VerticalStackLayout>
+
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Botões de Ação -->
+            <VerticalStackLayout Spacing="10">
+                <Button Text="✓ Confirmar Movimentação"
+                        Command="{Binding ConfirmarCommand}"
+                        BackgroundColor="#1E88E5"
+                        TextColor="White"
+                        FontAttributes="Bold"
+                        FontSize="15"
+                        CornerRadius="8"
+                        HeightRequest="50" />
+
+                <Button Text="Cancelar"
+                        Command="{Binding CancelarCommand}"
+                        BackgroundColor="Transparent"
+                        TextColor="#757575"
+                        FontSize="14"
+                        HeightRequest="44" />
+            </VerticalStackLayout>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

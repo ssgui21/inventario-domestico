@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:InventarioDomestico.App.ViewModels"
+             x:Class="InventarioDomestico.App.Views.ProdutoFormPage"
+             x:DataType="vm:ProdutoFormViewModel"
+             Title="{Binding Title}"
+             BackgroundColor="#F7F9FC">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="18" Spacing="16">
+
+            <!-- Card Formulário -->
+            <Frame BackgroundColor="White" CornerRadius="12" Padding="16" BorderColor="#E0E0E0">
+                <VerticalStackLayout Spacing="14">
+
+                    <!-- Nome do Produto -->
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Nome do Produto *" FontSize="13" FontAttributes="Bold" TextColor="#424242" />
+                        <Entry Text="{Binding Nome}"
+                               Placeholder="Ex: Detergente Neutro 500ml"
+                               ClearButtonVisibility="WhileEditing"
+                               FontSize="14" />
+                    </VerticalStackLayout>
+
+                    <!-- Categoria com opção de adicionar nova -->
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Categoria *" FontSize="13" FontAttributes="Bold" TextColor="#424242" />
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                            <Picker Grid.Column="0"
+                                    ItemsSource="{Binding CategoriasDisponiveis}"
+                                    SelectedItem="{Binding Categoria}"
+                                    Title="Selecione a categoria"
+                                    FontSize="14" />
+                            <Button Grid.Column="1"
+                                    Text="➕ Nova"
+                                    Command="{Binding AdicionarCategoriaCommand}"
+                                    BackgroundColor="#E3F2FD"
+                                    TextColor="#1E88E5"
+                                    FontSize="12"
+                                    HeightRequest="42"
+                                    Padding="10,0" />
+                        </Grid>
+                    </VerticalStackLayout>
+
+                    <!-- Local de Armazenamento com opção de adicionar novo -->
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Local de Armazenamento *" FontSize="13" FontAttributes="Bold" TextColor="#424242" />
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                            <Picker Grid.Column="0"
+                                    ItemsSource="{Binding LocaisDisponiveis}"
+                                    SelectedItem="{Binding LocalArmazenamento}"
+                                    Title="Selecione o local"
+                                    FontSize="14" />
+                            <Button Grid.Column="1"
+                                    Text="➕ Novo"
+                                    Command="{Binding AdicionarLocalCommand}"
+                                    BackgroundColor="#E3F2FD"
+                                    TextColor="#1E88E5"
+                                    FontSize="12"
+                                    HeightRequest="42"
+                                    Padding="10,0" />
+                        </Grid>
+                    </VerticalStackLayout>
+
+                    <!-- Unidade de Medida -->
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Unidade de Medida *" FontSize="13" FontAttributes="Bold" TextColor="#424242" />
+                        <Picker ItemsSource="{Binding UnidadesDisponiveis}"
+                                SelectedItem="{Binding UnidadeMedida}"
+                                Title="Selecione a unidade"
+                                FontSize="14" />
+                        <Label Text="Permite valores fracionários (ex: 1,5 kg ou 0,75 L)" FontSize="11" TextColor="#9E9E9E" />
+                    </VerticalStackLayout>
+
+                    <!-- Quantidade Inicial (visível apenas ao cadastrar novo) -->
+                    <VerticalStackLayout Spacing="4" IsVisible="{Binding IsNovo}">
+                        <Label Text="Quantidade Inicial em Estoque" FontSize="13" FontAttributes="Bold" TextColor="#424242" />
+                        <Entry Text="{Binding QuantidadeInicialTexto}"
+                               Keyboard="Numeric"
+                               Placeholder="0"
+                               FontSize="14" />
+                        <Label Text="Gera automaticamente o primeiro registro de movimentação de entrada." FontSize="11" TextColor="#9E9E9E" />
+                    </VerticalStackLayout>
+
+                    <!-- Quantidade Mínima para Reposição -->
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Quantidade Mínima para Alerta (Opcional)" FontSize="13" FontAttributes="Bold" TextColor="#424242" />
+                        <Entry Text="{Binding QuantidadeMinimaTexto}"
+                               Keyboard="Numeric"
+                               Placeholder="Ex: 2 (deixe vazio se não quiser alerta)"
+                               FontSize="14" />
+                        <Label Text="Quando o estoque atingir ou for menor que este valor, será emitido aviso de reposição." FontSize="11" TextColor="#9E9E9E" />
+                    </VerticalStackLayout>
+
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Botões de Ação -->
+            <VerticalStackLayout Spacing="10">
+                <Button Text="💾 Salvar Produto"
+                        Command="{Binding SalvarCommand}"
+                        BackgroundColor="#1E88E5"
+                        TextColor="White"
+                        FontAttributes="Bold"
+                        FontSize="15"
+                        CornerRadius="8"
+                        HeightRequest="50" />
+
+                <Button Text="Cancelar"
+                        Command="{Binding CancelarCommand}"
+                        BackgroundColor="Transparent"
+                        TextColor="#757575"
+                        FontSize="14"
+                        HeightRequest="44" />
+            </VerticalStackLayout>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

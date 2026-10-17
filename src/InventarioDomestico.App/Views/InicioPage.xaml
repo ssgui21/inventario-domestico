@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:InventarioDomestico.App.ViewModels"
+             xmlns:models="clr-namespace:InventarioDomestico.Core.Models;assembly=InventarioDomestico.Core"
+             x:Class="InventarioDomestico.App.Views.InicioPage"
+             x:DataType="vm:InicioViewModel"
+             Title="{Binding Title}"
+             BackgroundColor="#F7F9FC">
+
+    <RefreshView Command="{Binding CarregarDadosCommand}" IsRefreshing="{Binding IsBusy}">
+        <ScrollView>
+            <VerticalStackLayout Padding="16" Spacing="16">
+
+                <!-- Header de Boas-Vindas -->
+                <Frame BackgroundColor="#1E88E5" CornerRadius="12" Padding="18" HasShadow="True" BorderColor="Transparent">
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="📦 Inventário Residencial" FontSize="20" FontAttributes="Bold" TextColor="White" />
+                        <Label Text="Controle simplificado de estoque e reposição 100% offline." FontSize="13" TextColor="#E3F2FD" />
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Cards de Resumo (Grade 2x2) -->
+                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="12">
+                    
+                    <!-- Card Total de Produtos -->
+                    <Frame Grid.Row="0" Grid.Column="0" BackgroundColor="White" CornerRadius="10" Padding="14" BorderColor="#E0E0E0">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Total Itens" FontSize="12" TextColor="#757575" FontAttributes="Bold" />
+                            <Label Text="{Binding TotalProdutos}" FontSize="24" FontAttributes="Bold" TextColor="#212121" />
+                            <Label Text="produtos no catálogo" FontSize="11" TextColor="#9E9E9E" />
+                        </VerticalStackLayout>
+                    </Frame>
+
+                    <!-- Card Reposição Necessária -->
+                    <Frame Grid.Row="0" Grid.Column="1" BackgroundColor="#FFF3E0" CornerRadius="10" Padding="14" BorderColor="#FFE0B2">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Reposição" FontSize="12" TextColor="#E65100" FontAttributes="Bold" />
+                            <Label Text="{Binding TotalReposicao}" FontSize="24" FontAttributes="Bold" TextColor="#D84315" />
+                            <Label Text="abaixo do mínimo" FontSize="11" TextColor="#E65100" />
+                        </VerticalStackLayout>
+                    </Frame>
+
+                    <!-- Card Estoque Zerado -->
+                    <Frame Grid.Row="1" Grid.Column="0" BackgroundColor="#FFEBEE" CornerRadius="10" Padding="14" BorderColor="#FFCDD2">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Zerados" FontSize="12" TextColor="#C62828" FontAttributes="Bold" />
+                            <Label Text="{Binding TotalZerados}" FontSize="24" FontAttributes="Bold" TextColor="#B71C1C" />
+                            <Label Text="em falta total" FontSize="11" TextColor="#C62828" />
+                        </VerticalStackLayout>
+                    </Frame>
+
+                    <!-- Card Total Movimentações -->
+                    <Frame Grid.Row="1" Grid.Column="1" BackgroundColor="White" CornerRadius="10" Padding="14" BorderColor="#E0E0E0">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Movimentações" FontSize="12" TextColor="#757575" FontAttributes="Bold" />
+                            <Label Text="{Binding TotalMovimentacoes}" FontSize="24" FontAttributes="Bold" TextColor="#212121" />
+                            <Label Text="entradas / saídas" FontSize="11" TextColor="#9E9E9E" />
+                        </VerticalStackLayout>
+                    </Frame>
+                </Grid>
+
+                <!-- Botões de Ação Rápida -->
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                    <Button Grid.Column="0"
+                            Text="➕ Novo Produto"
+                            Command="{Binding NovoProdutoCommand}"
+                            BackgroundColor="#1E88E5"
+                            TextColor="White"
+                            FontAttributes="Bold"
+                            CornerRadius="8"
+                            HeightRequest="48" />
+
+                    <Button Grid.Column="1"
+                            Text="📋 Ver Produtos"
+                            Command="{Binding VerTodosProdutosCommand}"
+                            BackgroundColor="#455A64"
+                            TextColor="White"
+                            FontAttributes="Bold"
+                            CornerRadius="8"
+                            HeightRequest="48" />
+                </Grid>
+
+                <!-- Seção Itens em Alerta de Reposição -->
+                <VerticalStackLayout Spacing="8">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0" Text="⚠️ Itens que Precisam de Reposição" FontSize="16" FontAttributes="Bold" TextColor="#212121" VerticalOptions="Center" />
+                        <Label Grid.Column="1" Text="{Binding ItensEmAlerta.Count, StringFormat='({0})'}" FontSize="14" FontAttributes="Bold" TextColor="#D32F2F" VerticalOptions="Center" />
+                    </Grid>
+
+                    <CollectionView ItemsSource="{Binding ItensEmAlerta}" SelectionMode="None">
+                        <CollectionView.EmptyView>
+                            <Frame BackgroundColor="White" CornerRadius="8" Padding="20" BorderColor="#E0E0E0" Margin="0,4,0,0">
+                                <VerticalStackLayout HorizontalOptions="Center" Spacing="8">
+                                    <Label Text="🎉 Tudo Abastecido!" FontSize="16" FontAttributes="Bold" TextColor="#2E7D32" HorizontalTextAlignment="Center" />
+                                    <Label Text="Nenhum item com estoque abaixo da quantidade mínima no momento." FontSize="13" TextColor="#757575" HorizontalTextAlignment="Center" />
+                                </VerticalStackLayout>
+                            </Frame>
+                        </CollectionView.EmptyView>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:Produto">
+                                <Frame Margin="0,4,0,6" 
+                                       Padding="12" 
+                                       CornerRadius="8" 
+                                       BackgroundColor="{Binding PrecisaReposicao, Converter={StaticResource StockAlertColorConverter}}" 
+                                       BorderColor="{Binding PrecisaReposicao, Converter={StaticResource StockBorderColorConverter}}">
+                                    <Frame.GestureRecognizers>
+                                        <TapGestureRecognizer 
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:InicioViewModel}}, Path=SelecionarProdutoCommand}" 
+                                            CommandParameter="{Binding .}" />
+                                    </Frame.GestureRecognizers>
+                                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="8">
+                                        <Label Grid.Row="0" Grid.Column="0" Text="{Binding Nome}" FontSize="15" FontAttributes="Bold" TextColor="#212121" />
+                                        <Label Grid.Row="0" Grid.Column="1" Text="{Binding QuantidadeFormatada}" FontSize="15" FontAttributes="Bold" TextColor="#D32F2F" />
+                                        
+                                        <HorizontalStackLayout Grid.Row="1" Grid.Column="0" Spacing="8">
+                                            <Label Text="{Binding Categoria}" FontSize="12" TextColor="#616161" />
+                                            <Label Text="•" FontSize="12" TextColor="#9E9E9E" />
+                                            <Label Text="{Binding LocalArmazenamento}" FontSize="12" TextColor="#616161" />
+                                        </HorizontalStackLayout>
+
+                                        <Label Grid.Row="1" Grid.Column="1" Text="{Binding StatusEstoqueTexto}" FontSize="11" FontAttributes="Bold" TextColor="#C62828" HorizontalTextAlignment="End" />
+                                    </Grid>
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </RefreshView>
+</ContentPage>

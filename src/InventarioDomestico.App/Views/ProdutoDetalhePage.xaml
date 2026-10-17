@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:InventarioDomestico.App.ViewModels"
+             xmlns:models="clr-namespace:InventarioDomestico.Core.Models;assembly=InventarioDomestico.Core"
+             x:Class="InventarioDomestico.App.Views.ProdutoDetalhePage"
+             x:DataType="vm:ProdutoDetalheViewModel"
+             Title="{Binding Title}"
+             BackgroundColor="#F7F9FC">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="18" Spacing="16">
+
+            <!-- Card Principal com Quantidade em Destaque -->
+            <Frame BackgroundColor="White" 
+                   CornerRadius="12" 
+                   Padding="18" 
+                   BorderColor="{Binding Produto.PrecisaReposicao, Converter={StaticResource StockBorderColorConverter}}">
+                <VerticalStackLayout Spacing="10">
+
+                    <Label Text="{Binding Produto.Nome}" FontSize="22" FontAttributes="Bold" TextColor="#212121" />
+
+                    <!-- Status de Estoque -->
+                    <Frame BackgroundColor="{Binding Produto.PrecisaReposicao, Converter={StaticResource StockAlertColorConverter}}" 
+                           Padding="10,6" 
+                           CornerRadius="6" 
+                           BorderColor="Transparent" 
+                           HorizontalOptions="Start">
+                        <Label Text="{Binding Produto.StatusEstoqueTexto}" FontSize="12" FontAttributes="Bold" TextColor="#C62828" />
+                    </Frame>
+
+                    <!-- Quantidade Grande -->
+                    <VerticalStackLayout Spacing="2" Margin="0,8,0,0">
+                        <Label Text="Quantidade Atual em Estoque:" FontSize="12" TextColor="#757575" />
+                        <Label Text="{Binding Produto.QuantidadeFormatada}" FontSize="32" FontAttributes="Bold" TextColor="#1E88E5" />
+                    </VerticalStackLayout>
+
+                    <!-- Detalhes do Item -->
+                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="8" Margin="0,8,0,0">
+                        <VerticalStackLayout Grid.Row="0" Grid.Column="0">
+                            <Label Text="Categoria" FontSize="11" TextColor="#9E9E9E" />
+                            <Label Text="{Binding Produto.Categoria}" FontSize="14" FontAttributes="Bold" TextColor="#424242" />
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Grid.Row="0" Grid.Column="1">
+                            <Label Text="Local de Armazenamento" FontSize="11" TextColor="#9E9E9E" />
+                            <Label Text="{Binding Produto.LocalArmazenamento}" FontSize="14" FontAttributes="Bold" TextColor="#424242" />
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Grid.Row="1" Grid.Column="0">
+                            <Label Text="Estoque Mínimo" FontSize="11" TextColor="#9E9E9E" />
+                            <Label Text="{Binding Produto.QuantidadeMinimaFormatada}" FontSize="14" FontAttributes="Bold" TextColor="#424242" />
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Grid.Row="1" Grid.Column="1">
+                            <Label Text="Cadastrado em" FontSize="11" TextColor="#9E9E9E" />
+                            <Label Text="{Binding Produto.DataCriacao, StringFormat='{0:dd/MM/yyyy}'}" FontSize="14" TextColor="#424242" />
+                        </VerticalStackLayout>
+                    </Grid>
+
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Ações Rápidas de Movimentação de Estoque -->
+            <Label Text="Movimentar Estoque" FontSize="15" FontAttributes="Bold" TextColor="#212121" />
+
+            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10">
+                <Button Grid.Column="0"
+                        Text="➕ Entrada"
+                        Command="{Binding EntradaCommand}"
+                        BackgroundColor="#2E7D32"
+                        TextColor="White"
+                        FontAttributes="Bold"
+                        CornerRadius="8"
+                        HeightRequest="46" />
+
+                <Button Grid.Column="1"
+                        Text="➖ Saída"
+                        Command="{Binding SaidaCommand}"
+                        BackgroundColor="#C62828"
+                        TextColor="White"
+                        FontAttributes="Bold"
+                        CornerRadius="8"
+                        HeightRequest="46" />
+
+                <Button Grid.Column="2"
+                        Text="⚙️ Ajuste"
+                        Command="{Binding AjusteCommand}"
+                        BackgroundColor="#EF6C00"
+                        TextColor="White"
+                        FontAttributes="Bold"
+                        CornerRadius="8"
+                        HeightRequest="46" />
+            </Grid>
+
+            <!-- Resumo das Últimas Movimentações -->
+            <Frame BackgroundColor="White" CornerRadius="12" Padding="14" BorderColor="#E0E0E0">
+                <VerticalStackLayout Spacing="8">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0" Text="Histórico Recente" FontSize="14" FontAttributes="Bold" TextColor="#212121" VerticalOptions="Center" />
+                        <Button Grid.Column="1" 
+                                Text="Ver Tudo" 
+                                Command="{Binding VerHistoricoCommand}" 
+                                TextColor="#1E88E5" 
+                                BackgroundColor="Transparent" 
+                                FontSize="12" 
+                                Padding="6,2" 
+                                HeightRequest="32" />
+                    </Grid>
+
+                    <CollectionView ItemsSource="{Binding UltimasMovimentacoes}" SelectionMode="None">
+                        <CollectionView.EmptyView>
+                            <Label Text="Nenhuma movimentação registrada para este item." FontSize="12" TextColor="#9E9E9E" HorizontalTextAlignment="Center" Margin="0,10" />
+                        </CollectionView.EmptyView>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:MovimentacaoEstoque">
+                                <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" Padding="0,6" ColumnSpacing="8">
+                                    <Label Grid.Row="0" Grid.Column="0" Text="{Binding ResumoMovimentacao}" FontSize="13" FontAttributes="Bold" TextColor="#424242" />
+                                    <Label Grid.Row="0" Grid.Column="1" Text="{Binding DataHora, StringFormat='{0:dd/MM HH:mm}'}" FontSize="11" TextColor="#9E9E9E" />
+                                    <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Observacao}" FontSize="11" TextColor="#757575" IsVisible="{Binding Observacao, Converter={StaticResource InverseBooleanConverter}, ConverterParameter=Empty}" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Botões de Edição e Exclusão -->
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12" Margin="0,8,0,0">
+                <Button Grid.Column="0"
+                        Text="✏️ Editar Dados"
+                        Command="{Binding EditarCommand}"
+                        BackgroundColor="#ECEFF1"
+                        TextColor="#37474F"
+                        FontAttributes="Bold"
+                        CornerRadius="8"
+                        HeightRequest="46" />
+
+                <Button Grid.Column="1"
+                        Text="🗑️ Excluir"
+                        Command="{Binding ExcluirCommand}"
+                        BackgroundColor="#FFEBEE"
+                        TextColor="#C62828"
+                        FontAttributes="Bold"
+                        CornerRadius="8"
+                        HeightRequest="46" />
+            </Grid>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
