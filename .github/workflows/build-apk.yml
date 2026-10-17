@@ -31,10 +31,16 @@ jobs:
         run: dotnet workload install maui-android
 
       - name: Executar Testes Automatizados (xUnit)
-        run: dotnet test tests/InventarioDomestico.Tests/InventarioDomestico.Tests.csproj --configuration Release --verbosity normal
+        run: dotnet test tests/InventarioDomestico.Tests/InventarioDomestico.Tests.csproj --configuration Release --verbosity normal -p:CheckEolTargetFramework=false
 
       - name: Compilar e Gerar APK Android Assinado
-        run: dotnet publish src/InventarioDomestico.App/InventarioDomestico.App.csproj -f net8.0-android -c Debug -p:AndroidPackageFormat=apk
+        run: >
+          dotnet publish src/InventarioDomestico.App/InventarioDomestico.App.csproj
+          -f net8.0-android
+          -c Debug
+          -p:AndroidPackageFormat=apk
+          -p:CheckEolTargetFramework=false
+          -p:MauiVersion=8.0.100
 
       - name: Localizar Arquivo APK Gerado
         id: find_apk
