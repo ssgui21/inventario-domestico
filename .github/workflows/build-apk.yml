@@ -16,16 +16,23 @@ jobs:
       - name: Checkout do Repositório
         uses: actions/checkout@v4
 
-      - name: Configurar .NET 8 SDK
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0.x'
-
       - name: Configurar Java JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
+
+      - name: Configurar .NET 8 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Forçar uso estrito do .NET 8
+        shell: pwsh
+        run: |
+          echo "$env:DOTNET_ROOT" >> $env:GITHUB_PATH
+          '{ "sdk": { "version": "8.0.100", "rollForward": "latestFeature" } }' | Set-Content -Path global.json -Encoding utf8
+          dotnet --info
 
       - name: Instalar Workload MAUI Android
         run: dotnet workload install maui-android
