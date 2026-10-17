@@ -36,7 +36,7 @@ jobs:
           $testProj = Get-ChildItem -Recurse -Filter "*Tests.csproj" | Select-Object -First 1
           if ($testProj) {
             Write-Host "Executando testes em: $($testProj.FullName)"
-            dotnet test $testProj.FullName --configuration Release --verbosity normal -p:CheckEolTargetFramework=false
+            dotnet test $testProj.FullName --configuration Release --verbosity normal -p:CheckEolWorkloads=false -p:CheckEolTargetFramework=false -p:NoWarn=NETSDK1202
           } else {
             Write-Host "Aviso: Pasta de testes não encontrada. Prosseguindo direto para gerar o APK..."
           }
@@ -54,7 +54,7 @@ jobs:
             exit 1
           }
           Write-Host "Compilando aplicativo MAUI: $($appProj.FullName)"
-          dotnet publish $appProj.FullName -f net8.0-android -c Debug -p:AndroidPackageFormat=apk -p:CheckEolTargetFramework=false -p:MauiVersion=8.0.100
+          dotnet publish $appProj.FullName -f net8.0-android -c Debug -p:AndroidPackageFormat=apk -p:CheckEolWorkloads=false -p:CheckEolTargetFramework=false -p:NoWarn=NETSDK1202 -p:MauiVersion=8.0.100
 
       - name: Localizar Arquivo APK Gerado
         id: find_apk
