@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    name: Compilar e Gerar APK Instalável
+    name: Compilar APK Release Instalável
     runs-on: windows-latest
 
     steps:
@@ -37,31 +37,32 @@ jobs:
       - name: Instalar Workload MAUI Android
         run: dotnet workload install maui-android
 
-      - name: Executar Testes Automatizados (xUnit)
+      - name: Gerar Chave de Assinatura do APK
         shell: pwsh
         run: |
-          $testProj = Get-ChildItem -Recurse -Filter "*Tests.csproj" | Select-Object -First 1
-          if ($testProj) {
-            Write-Host "Executando testes em: $($testProj.FullName)"
-            dotnet test $testProj.FullName --configuration Release --verbosity normal -p:CheckEolWorkloads=false -p:CheckEolTargetFramework=false -p:NoWarn=NETSDK1202
-          } else {
-            Write-Host "Aviso: Pasta de testes não encontrada. Prosseguindo direto para gerar o APK..."
-          }
+          keytool -genkeypair -v -keystore app.keystore -alias appkey -keyalg RSA -keysize 2048 -validity 10000 -storepass senha123 -keypass senha123 -dname "CN=InventarioDomestico, O=App, C=BR"
 
-      - name: Compilar e Gerar APK Android Assinado
+      - name: Compilar e Publicar APK Release Autônomo
         shell: pwsh
         run: |
           $appProj = Get-ChildItem -Recurse -Filter "*App.csproj" | Select-Object -First 1
           if (-not $appProj) {
             $appProj = Get-ChildItem -Recurse -Filter "*.csproj" | Where-Object { $_.Name -notmatch "Tests" -and $_.Name -notmatch "Core" } | Select-Object -First 1
           }
-          if (-not $appProj) {
-            Write-Error "Projeto da aplicação MAUI (*App.csproj) não foi encontrado no repositório."
-            Get-ChildItem -Recurse | Select-Object FullName
-            exit 1
-          }
-          Write-Host "Compilando aplicativo MAUI: $($appProj.FullName)"
-          dotnet publish $appProj.FullName -f net8.0-android -c Debug -p:AndroidPackageFormat=apk -p:CheckEolWorkloads=false -p:CheckEolTargetFramework=false -p:NoWarn=NETSDK1202 -p:MauiVersion=8.0.100
+          Write-Host "Compilando projeto em Release: $($appProj.FullName)"
+          dotnet publish $appProj.FullName `
+            -f net8.0-android `
+            -c Release `
+            -p:AndroidPackageFormat=apk `
+            -p:AndroidKeyStore=true `
+            -p:AndroidSigningKeyStore=app.keystore `
+            -p:AndroidSigningStorePass=senha123 `
+            -p:AndroidSigningKeyAlias=appkey `
+            -p:AndroidSigningKeyPass=senha123 `
+            -p:CheckEolWorkloads=false `
+            -p:CheckEolTargetFramework=false `
+            -p:NoWarn=NETSDK1202 `
+            -p:MauiVersion=8.0.100
 
       - name: Localizar Arquivo APK Gerado
         id: find_apk
@@ -72,7 +73,7 @@ jobs:
             $apk = Get-ChildItem -Recurse -Filter "*.apk" | Select-Object -First 1
           }
           if ($apk) {
-            Write-Host "APK encontrado com sucesso: $($apk.FullName)"
+            Write-Host "APK Release encontrado com sucesso: $($apk.FullName)"
             echo "apk_path=$($apk.FullName)" >> $env:GITHUB_OUTPUT
           } else {
             Write-Error "Nenhum arquivo APK foi gerado na saída da compilação."
