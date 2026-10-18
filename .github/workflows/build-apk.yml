@@ -37,25 +37,27 @@ jobs:
       - name: Instalar Workload MAUI Android
         run: dotnet workload install maui-android
 
-      - name: Gerar Chave de Assinatura do APK
+      - name: Gerar Chave de Assinatura e Compilar APK Release
         shell: pwsh
         run: |
-          keytool -genkeypair -v -keystore app.keystore -alias appkey -keyalg RSA -keysize 2048 -validity 10000 -storepass senha123 -keypass senha123 -dname "CN=InventarioDomestico, O=App, C=BR"
-
-      - name: Compilar e Publicar APK Release Autônomo
-        shell: pwsh
-        run: |
+          # 1. Gerar chave com caminho absoluto
+          $keystore = Join-Path (Get-Location) "app.keystore"
+          keytool -genkeypair -v -keystore $keystore -alias appkey -keyalg RSA -keysize 2048 -validity 10000 -storepass senha123 -keypass senha123 -dname "CN=InventarioDomestico, O=App, C=BR"
+          
+          # 2. Localizar projeto App
           $appProj = Get-ChildItem -Recurse -Filter "*App.csproj" | Select-Object -First 1
           if (-not $appProj) {
             $appProj = Get-ChildItem -Recurse -Filter "*.csproj" | Where-Object { $_.Name -notmatch "Tests" -and $_.Name -notmatch "Core" } | Select-Object -First 1
           }
           Write-Host "Compilando projeto em Release: $($appProj.FullName)"
+
+          # 3. Compilar e assinar APK Release
           dotnet publish $appProj.FullName `
             -f net8.0-android `
             -c Release `
             -p:AndroidPackageFormat=apk `
             -p:AndroidKeyStore=true `
-            -p:AndroidSigningKeyStore=app.keystore `
+            -p:AndroidSigningKeyStore="$keystore" `
             -p:AndroidSigningStorePass=senha123 `
             -p:AndroidSigningKeyAlias=appkey `
             -p:AndroidSigningKeyPass=senha123 `
