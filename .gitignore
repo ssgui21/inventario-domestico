@@ -1,0 +1,32 @@
+## Visual Studio & VS Code
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Bb]in/
+[Oo]bj/
+
+## .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+## SQLite & Test databases
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+## Android
+*.apk
+*.aab
+*.dex
